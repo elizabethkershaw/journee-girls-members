@@ -123,6 +123,15 @@ def format_human_design(row):
     return profile or hd_type
 
 
+def shorten_human_design(label):
+    """Abbreviate long HD types for small screens (e.g. tablets/phones).
+
+    Currently only 'Manifesting Generator' is shortened to 'Mani-Gen'.
+    Returns the same string when nothing needs shortening.
+    """
+    return label.replace("Manifesting Generator", "Mani-Gen")
+
+
 def render_card(row):
     hexv = normalize_hex(row.get("color"))
     name = esc(row.get("name"))
@@ -142,7 +151,17 @@ def render_card(row):
         f'          <img class="member-photo" src="{src}" alt="{alt}" loading="lazy" />'
     )
     if hd_label:
-        parts.append(f'          <span class="member-hd">{esc(hd_label)}</span>')
+        hd_short = shorten_human_design(hd_label)
+        if hd_short != hd_label:
+            # Show the full label on desktop, the abbreviated one on tablet/phone
+            # (CSS swaps .hd-long / .hd-short by breakpoint).
+            parts.append(
+                f'          <span class="member-hd">'
+                f'<span class="hd-long">{esc(hd_label)}</span>'
+                f'<span class="hd-short">{esc(hd_short)}</span></span>'
+            )
+        else:
+            parts.append(f'          <span class="member-hd">{esc(hd_label)}</span>')
     parts.append("        </div>")
 
     parts.append('        <div class="member-body">')
@@ -222,7 +241,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700&family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="styles.css?v=25" />
 </head>
 <body>
   <!--

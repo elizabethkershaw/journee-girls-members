@@ -172,6 +172,21 @@ body {
   backdrop-filter: blur(4px);
 }
 
+/* Human Design tag: show full label by default, abbreviated on tablet/phone. */
+.member-hd .hd-short {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .member-hd .hd-long {
+    display: none;
+  }
+
+  .member-hd .hd-short {
+    display: inline;
+  }
+}
+
 .member-links {
   display: flex;
   flex-wrap: wrap;
@@ -310,55 +325,84 @@ body {
   margin-top: 32px;
 }
 
+/* Mobile: keep the same side-by-side card layout as desktop, just scaled
+   down a few px so cards stay compact instead of growing into tall boxes
+   with slivered photos. */
 @media (max-width: 860px) {
   .members-grid {
     grid-template-columns: 1fr;
-    grid-auto-rows: auto;
+    grid-auto-rows: 270px;
     max-width: 480px;
     margin: 0 auto;
   }
 
   .member-card {
-    min-height: 0;
+    min-height: 270px;
   }
 
-  /* Pin the photo to its grid column's own width explicitly. Left implicit,
-     it combines with the inherited height: 100% and an auto grid row to
-     create a circular sizing case that different engines resolve
-     differently — Safari/Chrome were sizing the photo from its aspect
-     ratio against the row instead of the column, so it overflowed sideways
-     into the text column. With width pinned, height: 100% (from the base
-     rule) simply stretches the photo to match whatever height the text
-     column ends up needing, cropped via object-fit: cover — no overflow. */
+  /* Pin the photo to its own column width (prevents a Safari/Chrome overflow
+     case where the photo sized off its aspect ratio and bled into the text). */
   .member-photo-wrap {
     width: 100%;
   }
 
   .member-body {
-    height: auto;
+    padding: 18px 18px 16px;
   }
 
-  .member-bio {
-    -webkit-line-clamp: unset;
-    overflow: visible;
-  }
-}
-
-@media (max-width: 420px) {
   .member-name {
     font-size: 19px;
   }
 
-  .member-body {
-    padding: 18px 16px 16px;
+  .member-title {
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+
+  .member-bio {
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-line-clamp: 5;
+  }
+
+  .member-hd {
+    bottom: 12px;
+    left: 12px;
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .member-links {
+    gap: 6px;
+    padding-top: 10px;
   }
 
   .member-link {
     font-size: 11px;
     padding: 4px 9px;
   }
+}
 
-  .member-links {
-    gap: 6px;
+@media (max-width: 420px) {
+  .members-grid {
+    grid-auto-rows: 250px;
+  }
+
+  .member-card {
+    min-height: 250px;
+  }
+
+  .member-body {
+    padding: 16px 14px 14px;
+  }
+
+  .member-name {
+    font-size: 18px;
+  }
+
+  .member-bio {
+    font-size: 12px;
+    -webkit-line-clamp: 4;
   }
 }
