@@ -39,16 +39,10 @@ running build.py.
 
 import csv
 import json
-import random
 import re
 import sys
 import urllib.parse
 from pathlib import Path
-
-SHOWCASE_URL = "https://journeegirlsclub.com"
-SHOWCASE_LABELS = (
-    "Linkedin", "Instagram", "Website", "Youtube", "Substack", "Podcast",
-)
 
 HERE = Path(__file__).resolve().parent
 CSV_PATH = HERE / "members.csv"
@@ -132,56 +126,27 @@ def extract_image_filename(raw):
     return match.group(1) if match else ""
 
 
+def normalize_url(url):
+    """Return a usable https URL, or empty if placeholder / invalid."""
+    url = (url or "").strip()
+    if not url or url.lower() in ("#", "https://", "http://"):
+        return ""
+    if not re.match(r"^https?://", url, re.I):
+        url = "https://" + url.lstrip("/")
+    return url
+
+
 def clean_link_fields(out):
     """Drop link pairs unless both name and a real URL are present."""
     for i in range(1, 7):
-        name = out.get(f"link{i}_name", "").strip()
-        url = out.get(f"link{i}_url", "").strip()
-        if url.lower() in ("#", "https://", "http://"):
-            url = ""
+        name = (out.get(f"link{i}_name") or "").strip()
+        url = normalize_url(out.get(f"link{i}_url"))
         if not (name and url):
             out[f"link{i}_name"] = ""
             out[f"link{i}_url"] = ""
         else:
             out[f"link{i}_name"] = name
             out[f"link{i}_url"] = url
-
-
-def fill_showcase_links(out):
-    """Give each member a stable random 0–4 demo links, all -> SHOWCASE_URL."""
-    rng = random.Random(out.get("name") or "")
-    target_count = rng.randint(0, 4)
-
-    notion_names = []
-    for i in range(1, 7):
-        name = (out.get(f"link{i}_name") or "").strip()
-        if name:
-            notion_names.append(name)
-
-    if target_count == 0:
-        for i in range(1, 7):
-            out[f"link{i}_name"] = ""
-            out[f"link{i}_url"] = ""
-        return
-
-    if len(notion_names) >= target_count:
-        chosen = rng.sample(notion_names, target_count)
-    else:
-        chosen = list(notion_names)
-        extras = [label for label in SHOWCASE_LABELS if label not in chosen]
-        rng.shuffle(extras)
-        for label in extras:
-            if len(chosen) >= target_count:
-                break
-            chosen.append(label)
-
-    for i in range(1, 7):
-        out[f"link{i}_name"] = ""
-        out[f"link{i}_url"] = ""
-
-    for i, name in enumerate(chosen, start=1):
-        out[f"link{i}_name"] = name
-        out[f"link{i}_url"] = SHOWCASE_URL
 
 
 def notion_row_to_csv_row(row):
@@ -201,7 +166,7 @@ def notion_row_to_csv_row(row):
     out["hd_profile"] = profile
     out["hd_type"] = hd_type
 
-    fill_showcase_links(out)
+    clean_link_fields(out)
     return out
 
 
