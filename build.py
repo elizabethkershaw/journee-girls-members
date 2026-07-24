@@ -171,6 +171,41 @@ def render_card(row):
     return "\n".join(parts)
 
 
+# --------------------------------------------------------------------------- #
+# Permanent call-to-action card                                               #
+#                                                                             #
+# Rendered directly by build.py (NOT sourced from members.csv / Notion) so it #
+# always appears as the very last card in the grid and can never be removed   #
+# or reordered by a Notion sync.                                              #
+# --------------------------------------------------------------------------- #
+
+CTA_IMAGE = "future-journee-girl.jpg"  # upload a file with this exact name into images/
+CTA_WAITLIST_URL = "https://journee-girls-club.kit.com/waitlist-opt-in"
+
+
+def render_cta_card():
+    src = f"images/{esc_attr(CTA_IMAGE)}"
+    return "\n".join([
+        '      <article class="member-card cta-card">',
+        '        <div class="member-photo-wrap">',
+        f'          <img class="member-photo" src="{src}" alt="Become a future Journee Girl" loading="lazy" />',
+        "        </div>",
+        '        <div class="member-body">',
+        '          <div class="member-content">',
+        '            <h2 class="member-name">Are you one of us?</h2>',
+        '            <p class="member-title">Future Journee Girl</p>',
+        '            <p class="member-bio">We open our doors for new members periodically, but you can stay up to date on applications and join some of our public events if you join our waitlist. If you\u2019re craving genuine friends with your level of ambition, we\u2019d love to meet you.</p>',
+        "          </div>",
+        '          <div class="member-links">',
+        f'            <a class="cta-button" href="{esc_attr(CTA_WAITLIST_URL)}" '
+        f'target="_blank" rel="noopener noreferrer">Join the Waitlist '
+        f'<span class="arrow">\u2192</span></a>',
+        "          </div>",
+        "        </div>",
+        "      </article>",
+    ])
+
+
 PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -184,7 +219,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700&family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=21" />
+  <link rel="stylesheet" href="styles.css?v=22" />
 </head>
 <body>
   <!--
@@ -194,10 +229,13 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   -->
   <main class="page">
     <h1 class="page-title">The Journee Girls</h1>
+    <p class="page-intro">Our members represent a hand-curated circle of exceptional female founders building meaningful projects. Every single girl has been selected for her level of her thinking, beliefs and work ethic, to strengthen our culture of achieving our goals with friends who match our ambition.</p>
 
     <section class="members-grid">
 {cards}
     </section>
+
+    <a class="back-to-site" href="https://journeegirlsclub.com">&#8592; Back to Site</a>
   </main>
 </body>
 </html>
@@ -209,7 +247,7 @@ def build():
         # Preserve CSV row order (set by sync_notion.py from the Notion view).
         rows = [r for r in csv.DictReader(f) if (r.get("name") or "").strip()]
 
-    cards = "\n".join(render_card(r) for r in rows)
+    cards = "\n".join(render_card(r) for r in rows) + "\n" + render_cta_card()
     html_out = PAGE_TEMPLATE.format(cards=cards)
 
     with open(OUT_PATH, "w", encoding="utf-8") as f:
