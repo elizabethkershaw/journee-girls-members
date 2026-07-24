@@ -216,6 +216,9 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
   <meta property="og:title" content="The Journee Girls" />
   <meta property="og:description" content="Members of Journee Girls Club — an online community of female founders and creators." />
   <meta property="og:type" content="website" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700&family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet" />
