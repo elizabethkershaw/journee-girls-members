@@ -322,15 +322,16 @@ body {
     min-height: 0;
   }
 
-  /* Give the photo a definite size via aspect-ratio (matching the ~3:4
-     width:height the 2fr column already has at the desktop's fixed 310px
-     row height) instead of the inherited height: 100%, which — since the
-     row itself is now auto-height — would otherwise resolve as indefinite
-     and fall back to each photo's own raw file aspect ratio, making card
-     height vary by whatever dimensions a member happened to upload. */
+  /* Pin the photo to its grid column's own width explicitly. Left implicit,
+     it combines with the inherited height: 100% and an auto grid row to
+     create a circular sizing case that different engines resolve
+     differently — Safari/Chrome were sizing the photo from its aspect
+     ratio against the row instead of the column, so it overflowed sideways
+     into the text column. With width pinned, height: 100% (from the base
+     rule) simply stretches the photo to match whatever height the text
+     column ends up needing, cropped via object-fit: cover — no overflow. */
   .member-photo-wrap {
-    height: auto;
-    aspect-ratio: 3 / 4;
+    width: 100%;
   }
 
   .member-body {
