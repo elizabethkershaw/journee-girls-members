@@ -313,15 +313,37 @@ body {
 @media (max-width: 860px) {
   .members-grid {
     grid-template-columns: 1fr;
-    grid-auto-rows: 310px;
+    grid-auto-rows: auto;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .member-card {
+    min-height: 0;
+  }
+
+  /* Give the photo a definite size via aspect-ratio (matching the ~3:4
+     width:height the 2fr column already has at the desktop's fixed 310px
+     row height) instead of the inherited height: 100%, which — since the
+     row itself is now auto-height — would otherwise resolve as indefinite
+     and fall back to each photo's own raw file aspect ratio, making card
+     height vary by whatever dimensions a member happened to upload. */
+  .member-photo-wrap {
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+
+  .member-body {
+    height: auto;
+  }
+
+  .member-bio {
+    -webkit-line-clamp: unset;
+    overflow: visible;
   }
 }
 
 @media (max-width: 420px) {
-  .member-card {
-    grid-template-columns: 5fr 11fr;
-  }
-
   .member-name {
     font-size: 19px;
   }
@@ -337,9 +359,5 @@ body {
 
   .member-links {
     gap: 6px;
-  }
-
-  .member-bio {
-    -webkit-line-clamp: 4;
   }
 }
