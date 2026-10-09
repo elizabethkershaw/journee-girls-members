@@ -39,6 +39,12 @@ OUT_PATH = os.path.join(HERE, "index.html")
 MAX_LINKS = 6
 DEFAULT_HEX = "#B6ADCB"
 
+# Still stored in members.csv / Notion; omitted from the published page only.
+HIDDEN_NAMES = frozenset({
+    "Sophie McErlich",
+    "Angelica Chandra",
+})
+
 
 # --------------------------------------------------------------------------- #
 # Colour helpers — derive card tint + title colour from one hex               #
@@ -267,7 +273,9 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 def build():
     with open(CSV_PATH, newline="", encoding="utf-8-sig") as f:
         # Preserve CSV row order (set by sync_notion.py from the Notion view).
-        rows = [r for r in csv.DictReader(f) if (r.get("name") or "").strip()]
+        all_rows = [r for r in csv.DictReader(f) if (r.get("name") or "").strip()]
+    rows = [r for r in all_rows if r["name"].strip() not in HIDDEN_NAMES]
+    hidden = len(all_rows) - len(rows)
 
     cards = "\n".join(render_card(r) for r in rows) + "\n" + render_cta_card()
     html_out = PAGE_TEMPLATE.format(cards=cards)
@@ -275,7 +283,8 @@ def build():
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         f.write(html_out)
 
-    print(f"Built {OUT_PATH} with {len(rows)} member(s).")
+    extra = f" ({hidden} hidden)" if hidden else ""
+    print(f"Built {OUT_PATH} with {len(rows)} member(s){extra}.")
 
 
 if __name__ == "__main__":

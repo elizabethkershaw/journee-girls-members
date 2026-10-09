@@ -126,6 +126,17 @@ def extract_image_filename(raw):
     return match.group(1) if match else ""
 
 
+BR_RE = re.compile(r"<br\s*/?>", re.I)
+TAG_RE = re.compile(r"<[^>]+>")
+
+
+def strip_html(text):
+    """Drop Notion line-break / markup leftovers from plain-text fields."""
+    text = BR_RE.sub(" ", text or "")
+    text = TAG_RE.sub("", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def normalize_url(url):
     """Return a usable https URL, or empty if placeholder / invalid."""
     url = (url or "").strip()
@@ -151,9 +162,9 @@ def clean_link_fields(out):
 
 def notion_row_to_csv_row(row):
     out = {k: "" for k in FIELDNAMES}
-    out["name"] = (row.get("Name") or "").strip()
-    out["title"] = (row.get("title") or "").strip()
-    out["bio"] = (row.get("bio MAX 180 CHARS") or "").strip()
+    out["name"] = strip_html(row.get("Name"))
+    out["title"] = strip_html(row.get("title"))
+    out["bio"] = strip_html(row.get("bio MAX 180 CHARS"))
     out["color"] = (row.get("color") or "").strip()
     out["join_date"] = (row.get("date:join_date:start") or "").strip()
     out["image"] = extract_image_filename(row.get("image"))
